@@ -1,0 +1,55 @@
+# This file defines all the services (containers) that make up our application.
+# We can start, stop, and manage all of them with a single command.
+
+version: '3.8'
+
+services:
+  # n8n: Our low-code workflow automation and AI orchestration tool.
+  n8n:
+    # This 'build' instruction tells Docker to look in the 'n8n_custom'
+    # directory for the Dockerfile to build our custom image.
+    build:
+      context: ./n8n_custom
+    container_name: n8n_service
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    volumes:
+      # This links the 'n8n_data' folder to a folder inside the container.
+      # It ensures all our workflows and settings are saved permanently.
+      - ./n8n_data:/home/node/.n8n
+      # This mounts our local 'scripts' folder into the container at '/scripts'
+      # so n8n can execute our Python scripts.
+      - ./scripts:/scripts
+    environment:
+      # This tells n8n how to generate webhook URLs.
+      - WEBHOOK_URL=http://localhost:5678
+      # This allows the Execute Command node to run scripts without certain restrictions.
+      - N8N_DISABLE_PRODUCTION_MAIN_PROCESS=true
+    networks:
+      - finance-net
+
+  # Ollama: Our local Large Language Model server.
+  ollama:
+    image: ollama/ollama
+    container_name: ollama_service
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      # This links the 'ollama_data' folder to store the downloaded AI models.
+      - ./ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - finance-net
+
+networks:
+  # This creates a private network for our services to communicate with each other.
+  finance-net:
+    driver: bridge
