@@ -1,0 +1,8 @@
+# Ignore application data and secrets
+/n8n_data/
+/ollama_data/
+/scripts/__pycache__/
+.env
+
+# Ignore system files
+.DS_Store
