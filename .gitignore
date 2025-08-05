@@ -1,8 +1,14 @@
 # Ignore application data and secrets
+# Contains n8n workflows and encrypted credentials
 /n8n_data/
+# Contains large, downloaded AI models
 /ollama_data/
+# Contains sensitive login session files
+/session_data/
+# Standard Python cache directory
 /scripts/__pycache__/
+# File for storing all secrets like API keys
 .env
 
-# Ignore system files
+# Ignore system-specific files
 .DS_Store
